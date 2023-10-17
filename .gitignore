@@ -1,6 +1,7 @@
 # Manual
-/temp_data/
-/GitHubData/
+temp_data/
+GitHubData/
+
 
 # General
 .DS_Store
