@@ -21,7 +21,7 @@ class FPN :
     dyr = Dirs()
 
     # temp data files
-    t0 = dyr.t / 't0.prq'
+    t0 = dyr.t / '0_stocks_cum_rets.prq'
 
 class ColName :
     pass
@@ -30,5 +30,5 @@ class ColName :
 c = tse_ns.Col()  # namespace
 gdu = GDU()
 dyr = Dirs()
-fpn = FPN()
+fp = FPN()
 cn = ColName()

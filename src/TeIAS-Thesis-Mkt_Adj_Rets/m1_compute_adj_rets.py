@@ -1,5 +1,6 @@
 """
-
+    Assumption:
+        - All working days have a linear filled adjusted price for each ticker
     """
 
 from mirutil.df import save_df_as_prq
@@ -27,21 +28,68 @@ def keep_relevant_cols(df) :
     df = df.drop(columns = c2d.keys())
     return df
 
-def get_all_work_days_and_sort(df) :
-    df = df[[c.d]].drop_duplicates()
-    df[c.d] = pd.to_datetime(df[c.d])
-    df = df.sort_values(c.d)
-    df[c.d] = df[c.d].dt.strftime('%Y-%m-%d')
+def gen_shifted_filled_adj_prices(df , shift_val) :
+    nc = c.aclose_lin + f'-m{shift_val}'
+    df[nc] = df.groupby(c.ftic)[c.aclose_lin].shift(shift_val)
     return df
 
-def gen_shifted_date(df , shift_val) :
-    nc = c.d + f'-m{shift_val}'
-    df[nc] = df[c.d].shift(shift_val)
-    return df
-
-def gen_all_shifted_dates(df) :
+def gen_all_shifted_adj_prices(df) :
     for shift_val in shifters.keys() :
-        df = gen_shifted_date(df , shift_val)
+        df = gen_shifted_filled_adj_prices(df , shift_val)
+    return df
+
+def gen_cum_ret_in_a_window(df , win_start , win_end) :
+    cst = c.aclose_lin + f'-m{win_start}'
+    ced = c.aclose_lin + f'-m{win_end}'
+    nc = f'R-m{win_start}m{win_end}'
+
+    # get cumulative return
+    df[nc] = df[ced] / df[cst] - 1
+
+    return df
+
+def gen_cum_rets_in_all_windows(df) :
+    winds = {
+            2   : 1 ,
+            5   : 2 ,
+            27  : 5 ,
+            119 : 27 ,
+            }
+
+    for ws , we in winds.items() :
+        df = gen_cum_ret_in_a_window(df , ws , we)
+
+    return df
+
+def keep_some_cols(df) :
+    cols = {
+            c.ftic        : None ,
+            c.d           : None ,
+            c.jd          : None ,
+            c.wd          : None ,
+            c.is_tic_open : None ,
+            'R-m2m1'      : None ,
+            'R-m5m2'      : None ,
+            'R-m27m5'     : None ,
+            'R-m119m27'   : None ,
+            }
+
+    return df[list(cols.keys())]
+
+def rename_ret_cols(df) :
+    winds = {
+            (2 , 1)    : cn.cr1 ,
+            (5 , 2)    : cn.cr2 ,
+            (27 , 5)   : cn.cr6 ,
+            (119 , 27) : cn.cr28 ,
+            }
+
+    for (ws , we) , nc in winds.items() :
+        oc = f'R-m{ws}m{we}'
+        df = df.rename(columns = {
+                oc : nc
+                })
+
     return df
 
 def main() :
@@ -54,44 +102,20 @@ def main() :
 
     ##
 
-    dfd = get_all_work_days_and_sort(df)
+    df = gen_all_shifted_adj_prices(df)
 
     ##
 
-    dfd = gen_all_shifted_dates(dfd)
+    df = gen_cum_rets_in_all_windows(df)
 
     ##
 
-    # merge shifted dates to the main dataframe
-    df = df.merge(dfd , how = 'left' , on = c.d)
+    df = keep_some_cols(df)
 
     ##
 
-    dfp = df[[c.ftic , c.d , c.aclose_lin]]
-
-    ##
-    dfp = dfp.rename(columns = {
-            c.aclose_lin : c.aclose_lin + '-m1'
-            })
-
-    df = df.merge(dfp ,
-                  how = 'left' ,
-                  left_on = [c.ftic , c.d + '-m1'] ,
-                  right_on = [c.ftic , c.d])
-
-    ##
-
-    ##
-
-    ##
-
-    dfv = df.head()
-    dfpv = dfp.head()
-
-    ##
-
-    ##
-
+    save_df_as_prq(df , fp.t0)
+    
 ##
 if __name__ == "__main__" :
     main()
