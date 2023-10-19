@@ -9,9 +9,9 @@ from githubdata import upload_2_github
 from mirutil.df import save_df_as_prq
 from mtok.mtok import ret_local_github_token_filepath
 
-from main import c
-from main import fpn
-from main import gdu
+from a_main import c
+from a_main import fpn
+from a_main import gdu
 
 def ret_data_fn(df) :
     jdate = df[c.jd].max()
