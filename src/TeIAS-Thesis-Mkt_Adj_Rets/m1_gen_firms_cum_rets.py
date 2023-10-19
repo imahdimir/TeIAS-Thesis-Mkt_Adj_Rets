@@ -3,9 +3,8 @@
         - All working days have a linear filled adjusted price for each ticker
     """
 
-from mirutil.df import save_df_as_prq
-import pandas as pd
 from githubdata import get_data_wo_double_clone
+from mirutil.df import save_df_as_prq
 
 from a_main import *
 
@@ -76,22 +75,6 @@ def keep_some_cols(df) :
 
     return df[list(cols.keys())]
 
-def rename_ret_cols(df) :
-    winds = {
-            (2 , 1)    : cn.cr1 ,
-            (5 , 2)    : cn.cr2 ,
-            (27 , 5)   : cn.cr6 ,
-            (119 , 27) : cn.cr28 ,
-            }
-
-    for (ws , we) , nc in winds.items() :
-        oc = f'R-m{ws}m{we}'
-        df = df.rename(columns = {
-                oc : nc
-                })
-
-    return df
-
 def main() :
     pass
 
@@ -115,7 +98,7 @@ def main() :
     ##
 
     save_df_as_prq(df , fp.t0)
-    
+
 ##
 if __name__ == "__main__" :
     main()
