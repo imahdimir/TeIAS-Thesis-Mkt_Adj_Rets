@@ -75,22 +75,6 @@ def keep_some_cols(df) :
 
     return df[list(cols.keys())]
 
-def rename_ret_cols(df) :
-    winds = {
-            (2 , 1)    : cn.cr1 ,
-            (5 , 2)    : cn.cr2 ,
-            (27 , 5)   : cn.cr6 ,
-            (119 , 27) : cn.cr28 ,
-            }
-
-    for (ws , we) , nc in winds.items() :
-        oc = f'R-m{ws}m{we}'
-        df = df.rename(columns = {
-                oc : nc
-                })
-
-    return df
-
 def main() :
     pass
 
