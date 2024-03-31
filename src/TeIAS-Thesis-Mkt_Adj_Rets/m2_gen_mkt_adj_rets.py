@@ -39,12 +39,15 @@ def gen_all_mkt_adj_rets(df) :
 
 def keep_some_cols(df) :
     cols = {
-            c.ftic : None ,
-            c.d    : None ,
-            cn.r1  : None ,
-            cn.r2  : None ,
-            cn.r6  : None ,
-            cn.r28 : None ,
+            c.ftic        : None ,
+            c.d           : None ,
+            c.jd          : None ,
+            c.wd          : None ,
+            c.is_tic_open : None ,
+            cn.r1         : None ,
+            cn.r2         : None ,
+            cn.r6         : None ,
+            cn.r28        : None ,
             }
 
     return df[list(cols.keys())]
